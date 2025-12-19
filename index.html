@@ -20,7 +20,6 @@
         
         /* สไตล์การ์ดแบบ Road Map */
         .ig-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .header-gradient { background: linear-gradient(135deg, #6b46c1 0%, #d53f8c 100%); color: white; }
         
         .stat-card { 
             background: white; 
@@ -43,8 +42,23 @@
         .filter-select:focus { border-color: var(--cspd-purple); }
 
         /* DataTable Custom */
-        table.dataTable thead th { background-color: #6b46c1; color: white !important; border-radius: 0; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #6b46c1 !important; color: white !important; border: none !important; border-radius: 10px; }
+        table.dataTable thead th { 
+            background-color: #6b46c1; 
+            color: white !important; 
+            border-radius: 0; 
+            font-weight: 500;
+        }
+        /* กำหนดสีตัวหนังสือในเนื้อหาตารางให้เป็นสีดำปกติ */
+        table.dataTable tbody td { 
+            color: #000000 !important; 
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { 
+            background: #6b46c1 !important; 
+            color: white !important; 
+            border: none !important; 
+            border-radius: 10px; 
+        }
     </style>
 </head>
 <body>
@@ -203,7 +217,6 @@
     }
 
     function renderCharts(join, absent, labels, barData) {
-        // Pie Chart สีม่วง-เหลือง
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -219,7 +232,6 @@
             options: { plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Bar Chart สีส้ม Gradient
         if (barChart) barChart.destroy();
         barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
@@ -245,13 +257,12 @@
         const absentStudents = students.filter(s => !attendIds.has(s.id));
         if ($.fn.DataTable.isDataTable('#absentTable')) $('#absentTable').DataTable().destroy();
 
+        // แสดงผลตัวอักษรสีดำธรรมดา ไม่ใส่พื้นหลัง
         document.getElementById('absentBody').innerHTML = absentStudents.map(s => `
             <tr>
-                <td class="py-4 px-4 font-bold text-purple-900">${s.id}</td>
+                <td class="py-4 px-4">${s.id}</td>
                 <td class="py-4 px-4">${s.name}</td>
-                <td class="py-4 px-4">
-                    <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">${s.school}</span>
-                </td>
+                <td class="py-4 px-4">${s.school}</td>
             </tr>
         `).join('');
 
