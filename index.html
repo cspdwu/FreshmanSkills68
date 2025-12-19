@@ -1,35 +1,262 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard กิจกรรมพุธบ่าย 2568</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #fafafa; color: #262626; }
+        .ig-card { background: white; border: 1px solid #dbdbdb; border-radius: 8px; }
+        .filter-select { border: 1px solid #dbdbdb; border-radius: 4px; padding: 6px 12px; background: #fff; font-size: 14px; }
+        .stat-card { background: #fff; border: 1px solid #dbdbdb; padding: 20px; text-align: center; flex: 1; border-radius: 8px; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #0095f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        table.dataTable { border: none !important; border-bottom: 1px solid #dbdbdb !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #0095f6 !important; color: white !important; border: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+    <div class="spinner mb-4"></div>
+    <p id="status-text">กำลังโหลดข้อมูลจาก Google Sheets...</p>
+</div>
+
+<div class="max-w-6xl mx-auto p-4 md:p-8">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-6 bg-white p-6 ig-card gap-4">
+        <div>
+            <h1 class="text-2xl font-medium">กิจกรรมพุธบ่าย 2568</h1>
+            <p class="text-gray-500 text-sm">ศูนย์ส่งเสริมและพัฒนานักศึกษา</p>
+        </div>
+        
+        <div class="flex flex-wrap gap-2 justify-center">
+            <select id="filterSchool" class="filter-select" onchange="updateDashboard()">
+                <option value="all">ทุกสำนักวิชา</option>
+            </select>
+            <select id="filterActivity" class="filter-select" onchange="updateDashboard()">
+                <option value="all">ทุกกิจกรรม</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <div class="stat-card">
+            <p class="text-gray-400 text-xs uppercase font-bold tracking-wider">จำนวนกิจกรรม</p>
+            <p class="text-3xl font-semibold mt-1" id="statTotalEvents">0</p>
+        </div>
+        <div class="stat-card">
+            <p class="text-gray-400 text-xs uppercase font-bold tracking-wider">นศ. ที่เข้าร่วม</p>
+            <p class="text-3xl font-semibold mt-1" id="statTotalJoin">0</p>
+        </div>
+        <div class="stat-card">
+            <p class="text-gray-400 text-xs uppercase font-bold tracking-wider">เปอร์เซ็นต์รวม</p>
+            <p class="text-3xl font-semibold mt-1 text-blue-500" id="statPercent">0%</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="ig-card p-6">
+            <h3 class="font-medium mb-6 text-sm text-gray-500 uppercase tracking-widest text-center">สัดส่วนการเข้าร่วม</h3>
+            <div class="max-w-[250px] mx-auto">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+        <div class="ig-card p-6">
+            <h3 class="font-medium mb-6 text-sm text-gray-500 uppercase tracking-widest text-center">สถิติรายกิจกรรม</h3>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <div class="ig-card p-6 mb-8">
+        <h3 class="font-medium mb-4 text-red-500 flex items-center">
+            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+            รายชื่อนักศึกษาที่ "ไม่เข้าร่วม"
+        </h3>
+        <div class="overflow-x-auto">
+            <table id="absentTable" class="display w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th>รหัสนักศึกษา</th>
+                        <th>ชื่อ-สกุล</th>
+                        <th>สำนักวิชา</th>
+                    </tr>
+                </thead>
+                <tbody id="absentBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
-    // *** สำคัญ: วาง URL ที่ได้จาก Google Apps Script Deployment ตรงนี้ ***
-    const API_URL = "https://script.google.com/macros/s/AKfycbyXygmps6SockUxRUaWgwdyEMLYO5crLN6XoQXeNlUVDspQU6r_wG5cXZ-PbSoGvcKm/exec"; 
+    // 1. ใส่ URL ของ Google Web App ที่ได้จากการ Deploy ที่นี่
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXygmps6SockUxRUaWgwdyEMLYO5crLN6XoQXeNlUVDspQU6r_wG5cXZ-PbSoGvcKm/exec"; 
 
     let rawData = null;
     let pieChart, barChart;
 
-    window.onload = () => {
-        fetchData();
-    };
+    // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
+    window.onload = fetchData;
 
     async function fetchData() {
+        const statusText = document.getElementById('status-text');
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(WEB_APP_URL);
             if (!response.ok) throw new Error('Network response was not ok');
-            const data = await response.json();
-            init(data);
+            
+            rawData = await response.json();
+            
+            // เติมข้อมูลใน Filter
+            renderFilters(rawData);
+            
+            // ซ่อนหน้า Loading
+            document.getElementById('loading-overlay').style.display = 'none';
+            
+            // อัปเดตข้อมูลหน้าเว็บ
+            updateDashboard();
+            
         } catch (error) {
-            console.error('Error fetching data:', error);
-            document.getElementById('loading').textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล: ' + error.message;
+            console.error('Error:', error);
+            statusText.innerHTML = `<span class="text-red-500">โหลดข้อมูลไม่สำเร็จ: ${error.message}<br>กรุณาตรวจสอบการ Deploy และ Permission</span>`;
         }
     }
 
-    function init(data) {
-        rawData = data;
-        document.getElementById('loading').style.display = 'none';
+    function renderFilters(data) {
+        const schoolFilter = document.getElementById('filterSchool');
+        data.schools.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            schoolFilter.appendChild(opt);
+        });
 
-        // จัดการเรื่อง Filter (โค้ดเดียวกับเวอร์ชันที่แล้ว)
-        renderFilters(data);
-        updateDashboard();
+        const activityFilter = document.getElementById('filterActivity');
+        data.activityNames.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a;
+            opt.textContent = a;
+            activityFilter.appendChild(opt);
+        });
     }
 
-    // ... ฟังก์ชัน renderFilters(), updateDashboard(), updateCharts(), updateTable() ...
-    // ก๊อปปี้จากเวอร์ชันก่อนหน้ามาใส่ได้เลยครับ
+    function updateDashboard() {
+        const selectedSchool = document.getElementById('filterSchool').value;
+        const selectedActivity = document.getElementById('filterActivity').value;
+
+        // กรองข้อมูลนักศึกษา
+        let filteredStudents = rawData.students;
+        if (selectedSchool !== 'all') {
+            filteredStudents = filteredStudents.filter(s => s.school === selectedSchool);
+        }
+
+        const studentIds = filteredStudents.map(s => s.id);
+        let attendIds = new Set();
+        let barData = [];
+        let labels = [];
+
+        if (selectedActivity === 'all') {
+            // กรณีดูภาพรวมทุกกิจกรรม
+            Object.values(rawData.activities).forEach(ids => {
+                ids.forEach(id => { if (studentIds.includes(id)) attendIds.add(id); });
+            });
+            labels = rawData.activityNames;
+            barData = rawData.activityNames.map(name => 
+                rawData.activities[name].filter(id => studentIds.includes(id)).length
+            );
+        } else {
+            // กรณีเลือกกิจกรรมใดกิจกรรมหนึ่ง
+            const currentActIds = rawData.activities[selectedActivity] || [];
+            currentActIds.forEach(id => { if (studentIds.includes(id)) attendIds.add(id); });
+            labels = [selectedActivity];
+            barData = [attendIds.size];
+        }
+
+        // อัปเดตตัวเลข Stats
+        const joinCount = attendIds.size;
+        const absentCount = filteredStudents.length - joinCount;
+        const percent = filteredStudents.length > 0 ? ((joinCount / filteredStudents.length) * 100).toFixed(1) : 0;
+
+        document.getElementById('statTotalEvents').textContent = rawData.activityNames.length;
+        document.getElementById('statTotalJoin').textContent = joinCount.toLocaleString();
+        document.getElementById('statPercent').textContent = percent + '%';
+
+        renderCharts(joinCount, absentCount, labels, barData);
+        renderTable(filteredStudents, attendIds);
+    }
+
+    function renderCharts(join, absent, labels, barData) {
+        // Pie Chart
+        if (pieChart) pieChart.destroy();
+        pieChart = new Chart(document.getElementById('pieChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['เข้าร่วม', 'ไม่เข้าร่วม'],
+                datasets: [{
+                    data: [join, absent],
+                    backgroundColor: ['#0095f6', '#efefef'],
+                    hoverOffset: 4,
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } } }
+        });
+
+        // Bar Chart
+        if (barChart) barChart.destroy();
+        barChart = new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'จำนวนคน',
+                    data: barData,
+                    backgroundColor: '#262626',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    function renderTable(students, attendIds) {
+        const absentStudents = students.filter(s => !attendIds.has(s.id));
+        
+        if ($.fn.DataTable.isDataTable('#absentTable')) {
+            $('#absentTable').DataTable().destroy();
+        }
+
+        const tbody = document.getElementById('absentBody');
+        tbody.innerHTML = absentStudents.map(s => `
+            <tr>
+                <td class="font-medium">${s.id}</td>
+                <td>${s.name}</td>
+                <td><span class="px-2 py-1 bg-gray-100 rounded-full text-xs">${s.school}</span></td>
+            </tr>
+        `).join('');
+
+        $('#absentTable').DataTable({
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
+            pageLength: 10,
+            order: [[0, 'asc']],
+            dom: 'tp' // แสดงเฉพาะตารางและตัวเปลี่ยนหน้า
+        });
+    }
 </script>
+
+</body>
+</html>
