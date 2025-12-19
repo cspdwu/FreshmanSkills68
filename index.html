@@ -10,124 +10,118 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     
     <style>
-        :root {
-            --cspd-purple: #6b46c1;
-            --cspd-orange: #f6ad55;
-            --cspd-yellow: #fbd38d;
-            --cspd-dark-purple: #44337a;
-        }
-        body { font-family: 'Kanit', sans-serif; background-color: #f7fafc; color: #2d3748; }
+        body { font-family: 'Kanit', sans-serif; background-color: #f8f9fa; color: #4a4a4a; }
         
-        /* สไตล์การ์ดแบบ Road Map */
-        .ig-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .header-gradient { background: linear-gradient(135deg, #6b46c1 0%, #d53f8c 100%); color: white; }
+        /* Dashboard Theme Colors */
+        .text-cspd-purple { color: #6b21a8; }
+        .bg-cspd-purple { background-color: #6b21a8; }
+        .text-cspd-pink { color: #db2777; }
         
-        .stat-card { 
-            background: white; 
-            padding: 24px; 
-            text-align: center; 
-            border-radius: 20px; 
-            border-top: 6px solid var(--cspd-purple);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .stat-card.orange { border-top-color: #ed8936; }
-        .stat-card.yellow { border-top-color: #ecc94b; }
+        .ig-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        
+        /* Stat Cards */
+        .stat-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; text-align: left; transition: 0.3s; }
+        .stat-card:hover { border-color: #db2777; }
+        .stat-label { color: #9ca3af; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-value { font-size: 1.875rem; font-weight: 700; color: #1f2937; margin-top: 4px; }
+        .stat-sub { font-size: 0.75rem; color: #6b7280; margin-top: 2px; }
+
+        /* Filters */
+        .filter-select { border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 12px; background: #fff; width: 100%; outline: none; font-size: 0.875rem; }
+        .filter-select:focus { border-color: #6b21a8; box-shadow: 0 0 0 2px rgba(107, 33, 168, 0.1); }
 
         /* Loading */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--cspd-purple); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinner { width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #db2777; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(3600deg); } }
 
-        /* Filter Style */
-        .filter-select { border: 2px solid #edf2f7; border-radius: 12px; padding: 10px 16px; background: #fff; outline: none; transition: 0.2s; }
-        .filter-select:focus { border-color: var(--cspd-purple); }
-
-        /* DataTable Custom */
-        table.dataTable thead th { background-color: #6b46c1; color: white !important; border-radius: 0; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #6b46c1 !important; color: white !important; border: none !important; border-radius: 10px; }
+        /* Table */
+        table.dataTable { border: none !important; border-top: 1px solid #f3f4f6 !important; }
+        table.dataTable thead th { background: #f9fafb; color: #6b7280; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #e5e7eb !important; padding: 12px !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #db2777 !important; color: white !important; border: none !important; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="spinner mb-4"></div>
-    <p class="text-purple-700 font-medium">กำลังโหลดข้อมูล Road Map 12 Week...</p>
+    <p class="text-sm text-gray-400">กำลังเตรียมข้อมูล Dashboard...</p>
 </div>
 
-<div class="max-w-7xl mx-auto p-4 md:p-10">
-    <header class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-8 ig-card gap-6 border-t-8 border-purple-600">
-        <div class="text-center md:text-left">
-            <h1 class="text-3xl font-bold text-purple-900 tracking-tight">ข้อมูลการเข้าร่วมกิจรรมพุธบ่าย 2568</h1>
-            <p class="text-orange-500 font-bold mt-1 tracking-widest uppercase text-sm">CSPD WALAILAK UNIVERSITY</p>
-        </div>
-        
-        <div class="flex flex-wrap gap-4 justify-center">
-            <div class="flex flex-col">
-                <label class="text-[11px] font-bold text-purple-400 mb-1 ml-1 uppercase">สำนักวิชา</label>
-                <select id="filterSchool" class="filter-select" onchange="updateDashboard()">
-                    <option value="all">แสดงทั้งหมด</option>
-                </select>
-            </div>
-            <div class="flex flex-col">
-                <label class="text-[11px] font-bold text-purple-400 mb-1 ml-1 uppercase">เลือกสัปดาห์กิจกรรม</label>
-                <select id="filterActivity" class="filter-select" onchange="updateDashboard()">
-                    <option value="all">รวมทั้ง 12 สัปดาห์</option>
-                </select>
-            </div>
-        </div>
-    </header>
+<div class="max-w-7xl mx-auto p-4 md:p-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-xl font-bold text-gray-800">ข้อมูลการเข้าร่วมกิจรรมพุธบ่าย 2568</h1>
+        <p class="text-xs text-gray-400">Dashboard Analytics</p>
+    </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-        <div class="stat-card">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">นักศึกษาทั้งหมด</p>
-            <p class="text-4xl font-bold mt-2 text-purple-700" id="statTotalStudents">0</p>
-        </div>
-        <div class="stat-card orange">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">เช็คชื่อเข้าร่วม (คน)</p>
-            <p class="text-4xl font-bold mt-2 text-orange-600" id="statTotalJoin">0</p>
-        </div>
-        <div class="stat-card yellow">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">ร้อยละการเข้าร่วม</p>
-            <div class="flex items-center justify-center gap-2">
-                <p class="text-4xl font-bold mt-2 text-yellow-600" id="statPercent">0%</p>
+    <div class="ig-card p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="text-xs font-semibold text-gray-500 mb-2 block">เลือกชมรม/สำนักวิชา:</label>
+                <select id="filterSchool" class="filter-select" onchange="updateDashboard()">
+                    <option value="all">ทั้งหมด (All Schools)</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-gray-500 mb-2 block">เลือกสัปดาห์กิจกรรม:</label>
+                <select id="filterActivity" class="filter-select" onchange="updateDashboard()">
+                    <option value="all">ภาพรวม 12 สัปดาห์</option>
+                </select>
             </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สัดส่วนการเข้าร่วม</h3>
-            <div class="max-w-[280px] mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div class="stat-card">
+            <p class="stat-label">นักศึกษาทั้งหมด</p>
+            <p class="stat-value" id="statTotalStudents">0</p>
+            <p class="stat-sub">ฐานข้อมูลนักศึกษาชั้นปีที่ 1</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">เช็คชื่อเข้าร่วมรวม</p>
+            <p class="stat-value text-cspd-purple" id="statTotalJoin">0</p>
+            <p class="stat-sub">จำนวนการเช็คชื่อสะสม</p>
+        </div>
+        <div class="stat-card">
+            <p class="stat-label">ร้อยละการเข้าร่วม</p>
+            <p class="stat-value text-cspd-pink" id="statPercent">0%</p>
+            <p class="stat-sub">เทียบกับจำนวนนักศึกษาที่เลือก</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-1 ig-card p-6 flex flex-col items-center">
+            <h3 class="text-sm font-semibold text-gray-700 mb-8 self-start">สัดส่วนการมา/ขาด</h3>
+            <div class="w-full max-w-[220px]">
                 <canvas id="pieChart"></canvas>
             </div>
         </div>
-        <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติ 12 สัปดาห์กิจกรรม</h3>
-            <canvas id="barChart"></canvas>
+        <div class="lg:col-span-2 ig-card p-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-8">สถิติจำนวนผู้เข้าร่วมรายกิจกรรม</h3>
+            <canvas id="barChart" height="150"></canvas>
         </div>
     </div>
 
-    <div class="ig-card p-8 mb-12">
+    <div class="ig-card p-6 mb-8">
         <div class="flex items-center mb-6">
-            <div class="w-2 h-8 bg-orange-500 rounded-full mr-4"></div>
-            <h3 class="text-xl font-bold text-slate-800">รายชื่อนักศึกษาที่ไม่เข้าร่วมกิจกรรม</h3>
+            <h3 class="text-sm font-semibold text-gray-700">รายชื่อนักศึกษาที่ไม่เข้าร่วมกิจกรรม</h3>
         </div>
         <div class="overflow-x-auto">
             <table id="absentTable" class="display w-full text-sm">
                 <thead>
                     <tr>
-                        <th class="text-left">รหัสนักศึกษา</th>
-                        <th class="text-left">ชื่อ-นามสกุล</th>
-                        <th class="text-left">สำนักวิชา</th>
+                        <th>รหัสนักศึกษา</th>
+                        <th>ชื่อ-นามสกุล</th>
+                        <th>สำนักวิชา</th>
                     </tr>
                 </thead>
-                <tbody id="absentBody"></tbody>
+                <tbody id="absentBody" class="text-gray-600"></tbody>
             </table>
         </div>
     </div>
 
-    <footer class="text-center py-10">
-        <p class="text-gray-400 text-xs">© 2025 CSPD.WU V.1 Toolkit System. All rights reserved.</p>
+    <footer class="text-center py-6 text-gray-400 text-[10px] border-t border-gray-100">
+        © 2025 CSPD.WU V.1 Toolkit System. All rights reserved.
     </footer>
 </div>
 
@@ -151,7 +145,7 @@
             updateDashboard();
         } catch (error) {
             console.error('Error:', error);
-            document.getElementById('loading-overlay').innerHTML = `<p class='text-red-500'>ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>`;
+            document.getElementById('loading-overlay').innerHTML = `<p class='text-red-500'>Connection Error</p>`;
         }
     }
 
@@ -203,23 +197,20 @@
     }
 
     function renderCharts(join, absent, labels, barData) {
-        // Pie Chart สีม่วง-เหลือง
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
+            type: 'doughnut',
             data: {
-                labels: ['เช็คชื่อเรียบร้อย', 'ขาดกิจกรรม'],
+                labels: ['มา', 'ขาด'],
                 datasets: [{
                     data: [join, absent],
-                    backgroundColor: ['#6b46c1', '#fbd38d'],
-                    borderWidth: 5,
-                    borderColor: '#ffffff'
+                    backgroundColor: ['#db2777', '#f3f4f6'],
+                    borderWidth: 0
                 }]
             },
-            options: { plugins: { legend: { position: 'bottom' } } }
+            options: { cutout: '75%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
         });
 
-        // Bar Chart สีส้ม Gradient
         if (barChart) barChart.destroy();
         barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
@@ -228,15 +219,17 @@
                 datasets: [{
                     label: 'จำนวนคน',
                     data: barData,
-                    backgroundColor: '#ed8936',
-                    borderRadius: 8
+                    backgroundColor: '#db2777',
+                    borderRadius: 4
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
                 plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, grid: { borderDash: [5,5] } } }
+                scales: { 
+                    y: { beginAtZero: true, grid: { borderDash: [2, 2], drawBorder: false } },
+                    x: { grid: { display: false } }
+                }
             }
         });
     }
@@ -246,19 +239,17 @@
         if ($.fn.DataTable.isDataTable('#absentTable')) $('#absentTable').DataTable().destroy();
 
         document.getElementById('absentBody').innerHTML = absentStudents.map(s => `
-            <tr>
-                <td class="py-4 px-4 font-bold text-purple-900">${s.id}</td>
-                <td class="py-4 px-4">${s.name}</td>
-                <td class="py-4 px-4">
-                    <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-xs font-bold">${s.school}</span>
-                </td>
+            <tr class="hover:bg-gray-50">
+                <td class="font-medium text-gray-900">${s.id}</td>
+                <td>${s.name}</td>
+                <td><span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">${s.school}</span></td>
             </tr>
         `).join('');
 
         $('#absentTable').DataTable({
             language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
-            pageLength: 10,
-            dom: '<"flex justify-between mb-4"f>rt<"flex justify-between mt-4"ip>',
+            pageLength: 5,
+            dom: 'tp',
         });
     }
 </script>
