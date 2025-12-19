@@ -97,7 +97,7 @@
             <p class="text-4xl font-bold mt-2 text-purple-700" id="statTotalStudents">0</p>
         </div>
         <div class="stat-card orange">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">เช็คชื่อเข้าร่วม (คน)</p>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">ผู้เข้าร่วมกิจกรรม (คน)</p>
             <p class="text-4xl font-bold mt-2 text-orange-600" id="statTotalJoin">0</p>
         </div>
         <div class="stat-card yellow">
@@ -116,7 +116,7 @@
             </div>
         </div>
         <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติ 12 สัปดาห์กิจกรรม</h3>
+            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติรายกิจกรรม</h3>
             <canvas id="barChart"></canvas>
         </div>
     </div>
@@ -221,7 +221,7 @@
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
-                labels: ['เช็คชื่อเรียบร้อย', 'ขาดกิจกรรม'],
+                labels: ['เข้าร่วมกิจกรรม', 'ขาดกิจกรรม'],
                 datasets: [{
                     data: [join, absent],
                     backgroundColor: ['#6b46c1', '#fbd38d'],
