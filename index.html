@@ -10,47 +10,49 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #fafafa; color: #262626; }
-        .ig-card { background: white; border: 1px solid #dbdbdb; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .filter-select { border: 1px solid #dbdbdb; border-radius: 8px; padding: 8px 16px; background: #fff; font-size: 14px; outline: none; transition: 0.3s; }
-        .filter-select:focus { border-color: #a8a8a8; }
-        .stat-card { background: white; border: 1px solid #dbdbdb; padding: 24px; text-align: center; border-radius: 12px; transition: transform 0.2s; }
-        .stat-card:hover { transform: translateY(-5px); }
+        body { font-family: 'Kanit', sans-serif; background-color: #f4f7f6; color: #333; }
+        .ig-card { background: white; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: none; }
+        .filter-select { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 20px; background: #fff; font-size: 14px; outline: none; transition: all 0.3s; color: #1e293b; }
+        .filter-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .stat-card { background: white; padding: 24px; text-align: center; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border-left: 5px solid #1e40af; }
         
+        /* สไตล์สีน้ำเงินแบบ dashboardbudget69 */
+        .bg-primary-blue { background-color: #1e40af; }
+        .text-primary-blue { color: #1e40af; }
+
         /* Loading Style */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-        .spinner { width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #E1306C; border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner { width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #1e40af; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* DataTables Custom */
-        table.dataTable thead th { background-color: #fafafa; border-bottom: 1px solid #dbdbdb !important; font-weight: 500; }
-        .dataTables_wrapper .dataTables_filter input { border: 1px solid #dbdbdb; border-radius: 6px; padding: 4px 8px; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%) !important; color: white !important; border: none !important; border-radius: 4px; }
+        table.dataTable thead th { background-color: #f8fafc; color: #475569; font-weight: 500; padding: 15px !important; border-bottom: 2px solid #e2e8f0 !important; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #1e40af !important; color: white !important; border: none !important; border-radius: 8px; }
     </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="spinner mb-4"></div>
-    <p id="status-text" class="text-gray-500 italic">กำลังดึงข้อมูลระบบ...</p>
+    <p id="status-text" class="text-gray-500">กำลังเตรียมข้อมูลระบบ...</p>
 </div>
 
-<div class="max-w-6xl mx-auto p-4 md:p-8">
-    <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-8 bg-white p-6 ig-card gap-6">
+<div class="max-w-7xl mx-auto p-4 md:p-10">
+    <header class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-8 ig-card gap-6">
         <div class="text-center md:text-left">
-            <h1 class="text-2xl font-semibold tracking-tight">ข้อมูลการเข้าร่วมกิจรรมพุธบ่าย 2568</h1>
-            <p class="text-gray-400 text-sm">ศูนย์ส่งเสริมและพัฒนานักศึกษา (CSPD)</p>
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">ข้อมูลการเข้าร่วมกิจรรมพุธบ่าย 2568</h1>
+            <p class="text-blue-600 font-medium mt-1">ศูนย์ส่งเสริมและพัฒนานักศึกษา (CSPD)</p>
         </div>
         
-        <div class="flex flex-wrap gap-3 justify-center">
+        <div class="flex flex-wrap gap-4 justify-center">
             <div class="flex flex-col">
-                <span class="text-[10px] uppercase text-gray-400 font-bold ml-1 mb-1">สำนักวิชา</span>
+                <span class="text-xs font-bold text-gray-500 mb-1 ml-1">สำนักวิชา</span>
                 <select id="filterSchool" class="filter-select" onchange="updateDashboard()">
                     <option value="all">ทั้งหมด</option>
                 </select>
             </div>
             <div class="flex flex-col">
-                <span class="text-[10px] uppercase text-gray-400 font-bold ml-1 mb-1">กิจกรรม</span>
+                <span class="text-xs font-bold text-gray-500 mb-1 ml-1">เลือกกิจกรรม</span>
                 <select id="filterActivity" class="filter-select" onchange="updateDashboard()">
                     <option value="all">ทุกกิจกรรม</option>
                 </select>
@@ -58,48 +60,46 @@
         </div>
     </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
         <div class="stat-card">
-            <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">Total Events</p>
-            <p class="text-4xl font-semibold mt-2 text-gray-800" id="statTotalEvents">0</p>
+            <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">จำนวนกิจกรรมทั้งหมด</p>
+            <p class="text-4xl font-bold mt-2 text-gray-800" id="statTotalEvents">0</p>
         </div>
-        <div class="stat-card">
-            <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">Attendance</p>
-            <p class="text-4xl font-semibold mt-2 text-gray-800" id="statTotalJoin">0</p>
+        <div class="stat-card" style="border-left-color: #3b82f6;">
+            <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">จำนวนนักศึกษาที่เข้าร่วม</p>
+            <p class="text-4xl font-bold mt-2 text-gray-800" id="statTotalJoin">0</p>
         </div>
-        <div class="stat-card border-t-4 border-t-[#E1306C]">
-            <p class="text-gray-400 text-xs uppercase font-bold tracking-widest">Success Rate</p>
-            <p class="text-4xl font-semibold mt-2 text-[#E1306C]" id="statPercent">0%</p>
+        <div class="stat-card" style="border-left-color: #10b981;">
+            <p class="text-gray-500 text-sm font-medium uppercase tracking-wider">ร้อยละการเข้าร่วม</p>
+            <p class="text-4xl font-bold mt-2 text-green-600" id="statPercent">0%</p>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
         <div class="ig-card p-8">
-            <h3 class="font-medium mb-8 text-xs text-gray-400 uppercase tracking-[0.2em] text-center">Participation Ratio</h3>
-            <div class="max-w-[280px] mx-auto">
+            <h3 class="text-lg font-semibold mb-8 text-gray-700 border-b pb-4">สัดส่วนการเข้าร่วมกิจกรรมรวม</h3>
+            <div class="max-w-[300px] mx-auto">
                 <canvas id="pieChart"></canvas>
             </div>
         </div>
         <div class="ig-card p-8">
-            <h3 class="font-medium mb-8 text-xs text-gray-400 uppercase tracking-[0.2em] text-center">Activity Breakdown</h3>
+            <h3 class="text-lg font-semibold mb-8 text-gray-700 border-b pb-4">จำนวนผู้เข้าร่วมรายกิจกรรม (เปรียบเทียบ)</h3>
             <canvas id="barChart"></canvas>
         </div>
     </div>
 
     <div class="ig-card p-8 mb-12">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="font-medium text-gray-800 flex items-center">
-                <span class="w-3 h-3 bg-red-500 rounded-full mr-3 animate-pulse"></span>
-                รายชื่อนักศึกษาที่ขาดการร่วมกิจกรรม
-            </h3>
+        <div class="flex items-center mb-6">
+            <div class="w-2 h-8 bg-red-500 rounded-full mr-4"></div>
+            <h3 class="text-xl font-bold text-gray-800">รายชื่อนักศึกษาที่ไม่เข้าร่วมกิจกรรม</h3>
         </div>
         <div class="overflow-x-auto">
             <table id="absentTable" class="display w-full text-sm">
                 <thead>
                     <tr>
-                        <th class="py-4 px-4 text-left">รหัสนักศึกษา</th>
-                        <th class="py-4 px-4 text-left">ชื่อ-สกุล</th>
-                        <th class="py-4 px-4 text-left">สำนักวิชา</th>
+                        <th class="text-left">รหัสนักศึกษา</th>
+                        <th class="text-left">ชื่อ-นามสกุล</th>
+                        <th class="text-left">สำนักวิชา</th>
                     </tr>
                 </thead>
                 <tbody id="absentBody"></tbody>
@@ -107,8 +107,8 @@
         </div>
     </div>
 
-    <footer class="text-center py-10 border-t border-gray-200">
-        <p class="text-gray-400 text-xs tracking-wide">© 2025 CSPD.WU V.1 Toolkit System. All rights reserved.</p>
+    <footer class="text-center py-10">
+        <p class="text-gray-500 text-sm">© 2025 CSPD.WU V.1 Toolkit System. All rights reserved.</p>
     </footer>
 </div>
 
@@ -116,7 +116,7 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-    // 1. ใส่ URL ของ Google Web App ของคุณที่นี่
+    // เชื่อมต่อ WEB_APP_URL ที่ระบุมา
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXygmps6SockUxRUaWgwdyEMLYO5crLN6XoQXeNlUVDspQU6r_wG5cXZ-PbSoGvcKm/exec"; 
 
     let rawData = null;
@@ -133,7 +133,7 @@
             updateDashboard();
         } catch (error) {
             console.error('Error:', error);
-            document.getElementById('status-text').innerHTML = `<span class="text-red-500">Error: ไม่สามารถโหลดข้อมูลได้</span>`;
+            document.getElementById('status-text').innerHTML = `<span class="text-red-500 font-bold">ไม่สามารถเชื่อมต่อข้อมูลได้ กรุณาลองใหม่</span>`;
         }
     }
 
@@ -193,46 +193,45 @@
     }
 
     function renderCharts(join, absent, labels, barData) {
-        // Pie Chart with Instagram Colors
+        // กราฟวงกลม สีน้ำเงิน-เทา
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
-            type: 'doughnut',
+            type: 'pie',
             data: {
-                labels: ['เข้าร่วม', 'ขาด'],
+                labels: ['เข้าร่วม', 'ไม่ได้เข้าร่วม'],
                 datasets: [{
                     data: [join, absent],
-                    backgroundColor: ['#E1306C', '#F5F5F5'],
-                    borderWidth: 0,
-                    hoverOffset: 10
+                    backgroundColor: ['#1e40af', '#e2e8f0'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
             options: {
-                cutout: '80%',
                 plugins: {
-                    legend: { position: 'bottom', labels: { padding: 20, font: { size: 12, family: 'Kanit' } } }
+                    legend: { position: 'bottom', labels: { font: { family: 'Kanit' } } }
                 }
             }
         });
 
-        // Bar Chart with Gradient Style
+        // กราฟแท่ง สีน้ำเงินพรีเมียม
         if (barChart) barChart.destroy();
         barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'จำนวนนักศึกษา',
+                    label: 'จำนวนคน',
                     data: barData,
-                    backgroundColor: '#405DE6',
-                    borderRadius: 6,
-                    maxBarThickness: 40
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 8,
+                    maxBarThickness: 50
                 }]
             },
             options: {
                 responsive: true,
                 plugins: { legend: { display: false } },
                 scales: { 
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' }, border: { display: false } },
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
                     x: { grid: { display: false } }
                 }
             }
@@ -244,11 +243,11 @@
         if ($.fn.DataTable.isDataTable('#absentTable')) $('#absentTable').DataTable().destroy();
 
         document.getElementById('absentBody').innerHTML = absentStudents.map(s => `
-            <tr class="hover:bg-gray-50 transition-colors">
-                <td class="py-4 px-4 font-medium border-b border-gray-100">${s.id}</td>
-                <td class="py-4 px-4 border-b border-gray-100">${s.name}</td>
-                <td class="py-4 px-4 border-b border-gray-100">
-                    <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 text-gray-500 rounded-md">${s.school}</span>
+            <tr>
+                <td class="py-4 px-4 font-bold text-blue-900">${s.id}</td>
+                <td class="py-4 px-4">${s.name}</td>
+                <td class="py-4 px-4">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium">${s.school}</span>
                 </td>
             </tr>
         `).join('');
@@ -256,7 +255,7 @@
         $('#absentTable').DataTable({
             language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
             pageLength: 10,
-            dom: '<"flex justify-between mb-4"f>rt<"flex justify-between mt-4"ip>',
+            dom: '<"flex flex-col md:flex-row justify-between gap-4 mb-4"f>rt<"flex flex-col md:flex-row justify-between mt-4 items-center"ip>',
         });
     }
 </script>
