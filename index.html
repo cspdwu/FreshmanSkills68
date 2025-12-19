@@ -97,7 +97,7 @@
             <p class="text-4xl font-bold mt-2 text-purple-700" id="statTotalStudents">0</p>
         </div>
         <div class="stat-card orange">
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">ผู้เข้าร่วมกิจกรรม (คน)</p>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">ผู้เข้าร่วม (คน)</p>
             <p class="text-4xl font-bold mt-2 text-orange-600" id="statTotalJoin">0</p>
         </div>
         <div class="stat-card yellow">
@@ -116,7 +116,7 @@
             </div>
         </div>
         <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติรายกิจกรรม</h3>
+            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติการเข้าร่วมกิจกรรม</h3>
             <canvas id="barChart"></canvas>
         </div>
     </div>
@@ -217,6 +217,7 @@
     }
 
     function renderCharts(join, absent, labels, barData) {
+        // แก้ไข Pie Chart: เปลี่ยนสีเขียวอ่อน/เหลือง และนำเส้นขอบออก
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -224,12 +225,18 @@
                 labels: ['เข้าร่วมกิจกรรม', 'ขาดกิจกรรม'],
                 datasets: [{
                     data: [join, absent],
-                    backgroundColor: ['#6b46c1', '#fbd38d'],
-                    borderWidth: 5,
-                    borderColor: '#ffffff'
+                    backgroundColor: ['#9ae6b4', '#faf089'], // เขียวอ่อน (#9ae6b4) และเหลือง (#faf089) โทน CSPD
+                    borderWidth: 0 // นำเส้นขอบ (Stroke) ออก
                 }]
             },
-            options: { plugins: { legend: { position: 'bottom' } } }
+            options: { 
+                plugins: { 
+                    legend: { 
+                        position: 'bottom',
+                        labels: { font: { family: 'Kanit' } }
+                    } 
+                } 
+            }
         });
 
         if (barChart) barChart.destroy();
@@ -248,7 +255,10 @@
                 indexAxis: 'y',
                 responsive: true,
                 plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, grid: { borderDash: [5,5] } } }
+                scales: { 
+                    x: { beginAtZero: true, grid: { borderDash: [5,5] } },
+                    y: { ticks: { font: { family: 'Kanit' } } }
+                }
             }
         });
     }
@@ -257,7 +267,6 @@
         const absentStudents = students.filter(s => !attendIds.has(s.id));
         if ($.fn.DataTable.isDataTable('#absentTable')) $('#absentTable').DataTable().destroy();
 
-        // แสดงผลตัวอักษรสีดำธรรมดา ไม่ใส่พื้นหลัง
         document.getElementById('absentBody').innerHTML = absentStudents.map(s => `
             <tr>
                 <td class="py-4 px-4">${s.id}</td>
