@@ -141,7 +141,7 @@
     </div>
 
     <footer class="text-center py-10">
-        <p class="text-gray-400 text-xs">© 2025 CSPD.WU V.1 Toolkit System. All rights reserved.</p>
+        <p class="text-gray-400 text-xs">© 2025 ฝ่ายพัฒนากิจกรรมสร้างสรรค์ CSPD.WU. All rights reserved.</p>
     </footer>
 </div>
 
@@ -217,7 +217,6 @@
     }
 
     function renderCharts(join, absent, labels, barData) {
-        // แก้ไข Pie Chart: เปลี่ยนสีเขียวอ่อน/เหลือง และนำเส้นขอบออก
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -225,8 +224,8 @@
                 labels: ['เข้าร่วมกิจกรรม', 'ขาดกิจกรรม'],
                 datasets: [{
                     data: [join, absent],
-                    backgroundColor: ['#9ae6b4', '#faf089'], // เขียวอ่อน (#9ae6b4) และเหลือง (#faf089) โทน CSPD
-                    borderWidth: 0 // นำเส้นขอบ (Stroke) ออก
+                    backgroundColor: ['#259b24', '#ffd54f'], // สีเขียวเข้ม (#259b24) และเหลืองทอง (#ffd54f)
+                    borderWidth: 0 
                 }]
             },
             options: { 
