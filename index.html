@@ -18,7 +18,7 @@
         }
         body { font-family: 'Kanit', sans-serif; background-color: #f7fafc; color: #2d3748; }
         
-        /* สไตล์การ์ดแบบ Road Map */
+        /* สไตล์การ์ดแบบ Modern Minimal */
         .ig-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .stat-card { 
@@ -32,32 +32,39 @@
         .stat-card.orange { border-top-color: #ed8936; }
         .stat-card.yellow { border-top-color: #ecc94b; }
 
-        /* Loading */
+        /* Loading Overlay */
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
         .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--cspd-purple); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Filter Style */
-        .filter-select { border: 2px solid #edf2f7; border-radius: 12px; padding: 10px 16px; background: #fff; outline: none; transition: 0.2s; }
+        .filter-select { border: 2px solid #edf2f7; border-radius: 12px; padding: 10px 16px; background: #fff; outline: none; transition: 0.2s; min-width: 200px; }
         .filter-select:focus { border-color: var(--cspd-purple); }
 
-        /* DataTable Custom */
+        /* DataTable Custom - Black Text Content */
         table.dataTable thead th { 
             background-color: #6b46c1; 
             color: white !important; 
             border-radius: 0; 
             font-weight: 500;
+            padding: 12px 16px !important;
         }
-        /* กำหนดสีตัวหนังสือในเนื้อหาตารางให้เป็นสีดำปกติ */
         table.dataTable tbody td { 
             color: #000000 !important; 
             border-bottom: 1px solid #f3f4f6 !important;
+            padding: 12px 16px !important;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button.current { 
             background: #6b46c1 !important; 
             color: white !important; 
             border: none !important; 
             border-radius: 10px; 
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 4px 8px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -69,6 +76,7 @@
 </div>
 
 <div class="max-w-7xl mx-auto p-4 md:p-10">
+    <!-- Header Section -->
     <header class="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-8 ig-card gap-6 border-t-8 border-purple-600">
         <div class="text-center md:text-left">
             <h1 class="text-3xl font-bold text-purple-900 tracking-tight">ข้อมูลการเข้าร่วมกิจรรมพุธบ่าย 2568</h1>
@@ -83,14 +91,15 @@
                 </select>
             </div>
             <div class="flex flex-col">
-                <label class="text-[11px] font-bold text-purple-400 mb-1 ml-1 uppercase">เลือกสัปดาห์กิจกรรม</label>
+                <label class="text-[11px] font-bold text-purple-400 mb-1 ml-1 uppercase">สัปดาห์กิจกรรม</label>
                 <select id="filterActivity" class="filter-select" onchange="updateDashboard()">
-                    <option value="all">รวมทั้ง 12 สัปดาห์</option>
+                    <!-- รายชื่อกิจกรรมจะถูกเติมโดย JavaScript -->
                 </select>
             </div>
         </div>
     </header>
 
+    <!-- Stats Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
         <div class="stat-card">
             <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">นักศึกษาทั้งหมด</p>
@@ -108,19 +117,17 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สัดส่วนการเข้าร่วม</h3>
-            <div class="max-w-[280px] mx-auto">
+    <!-- Charts Row -->
+    <div class="flex justify-center mb-10">
+        <div class="ig-card p-8 w-full max-w-2xl">
+            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สัดส่วนการเข้าร่วมกิจกรรม</h3>
+            <div class="max-w-[320px] mx-auto">
                 <canvas id="pieChart"></canvas>
             </div>
         </div>
-        <div class="ig-card p-8">
-            <h3 class="text-md font-bold mb-8 text-purple-800 text-center uppercase border-b pb-4">สถิติการเข้าร่วมกิจกรรม</h3>
-            <canvas id="barChart"></canvas>
-        </div>
     </div>
 
+    <!-- Absentee Table -->
     <div class="ig-card p-8 mb-12">
         <div class="flex items-center mb-6">
             <div class="w-2 h-8 bg-orange-500 rounded-full mr-4"></div>
@@ -140,7 +147,8 @@
         </div>
     </div>
 
-    <footer class="text-center py-10">
+    <!-- Footer -->
+    <footer class="text-center py-10 border-t border-gray-100">
         <p class="text-gray-400 text-xs">© 2025 ฝ่ายพัฒนากิจกรรมสร้างสรรค์ CSPD.WU. All rights reserved.</p>
     </footer>
 </div>
@@ -152,7 +160,7 @@
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXygmps6SockUxRUaWgwdyEMLYO5crLN6XoQXeNlUVDspQU6r_wG5cXZ-PbSoGvcKm/exec"; 
 
     let rawData = null;
-    let pieChart, barChart;
+    let pieChart;
 
     window.onload = fetchData;
 
@@ -160,20 +168,30 @@
         try {
             const response = await fetch(WEB_APP_URL);
             rawData = await response.json();
+            
             renderFilters(rawData);
+            
+            // ตั้งค่าเริ่มต้นให้เลือกกิจกรรมแรกเสมอ
+            if (rawData.activityNames && rawData.activityNames.length > 0) {
+                document.getElementById('filterActivity').value = rawData.activityNames[0];
+            }
+            
             document.getElementById('loading-overlay').style.display = 'none';
             updateDashboard();
         } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('loading-overlay').innerHTML = `<p class='text-red-500'>ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>`;
+            console.error('Error fetching data:', error);
+            document.getElementById('loading-overlay').innerHTML = `<p class='text-red-500 p-4 text-center'>ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>`;
         }
     }
 
     function renderFilters(data) {
+        // เติมรายชื่อสำนักวิชา
         const schoolFilter = document.getElementById('filterSchool');
         data.schools.forEach(s => schoolFilter.add(new Option(s, s)));
 
+        // เติมรายชื่อกิจกรรม
         const activityFilter = document.getElementById('filterActivity');
+        activityFilter.innerHTML = ""; 
         data.activityNames.forEach(a => activityFilter.add(new Option(a, a)));
     }
 
@@ -181,42 +199,37 @@
         const selectedSchool = document.getElementById('filterSchool').value;
         const selectedActivity = document.getElementById('filterActivity').value;
 
+        // 1. กรองตามสำนักวิชา
         let filteredStudents = rawData.students;
-        if (selectedSchool !== 'all') filteredStudents = filteredStudents.filter(s => s.school === selectedSchool);
-
-        const studentIds = filteredStudents.map(s => s.id);
-        let attendIds = new Set();
-        let barData = [];
-        let labels = [];
-
-        if (selectedActivity === 'all') {
-            Object.values(rawData.activities).forEach(ids => {
-                ids.forEach(id => { if (studentIds.includes(id)) attendIds.add(id); });
-            });
-            labels = rawData.activityNames;
-            barData = rawData.activityNames.map(name => 
-                rawData.activities[name].filter(id => studentIds.includes(id)).length
-            );
-        } else {
-            const currentActIds = rawData.activities[selectedActivity] || [];
-            currentActIds.forEach(id => { if (studentIds.includes(id)) attendIds.add(id); });
-            labels = [selectedActivity];
-            barData = [attendIds.size];
+        if (selectedSchool !== 'all') {
+            filteredStudents = filteredStudents.filter(s => s.school === selectedSchool);
         }
 
-        const joinCount = attendIds.size;
-        const absentCount = filteredStudents.length - joinCount;
-        const percent = filteredStudents.length > 0 ? ((joinCount / filteredStudents.length) * 100).toFixed(1) : 0;
+        const studentIdsInFilter = filteredStudents.map(s => String(s.id));
+        let attendIds = new Set();
 
-        document.getElementById('statTotalStudents').textContent = filteredStudents.length.toLocaleString();
+        // 2. คำนวณผู้เข้าร่วมกิจกรรมรายสัปดาห์
+        const currentActIds = rawData.activities[selectedActivity] || [];
+        currentActIds.forEach(id => { 
+            if (studentIdsInFilter.includes(String(id))) attendIds.add(String(id)); 
+        });
+        
+        const totalInFilter = filteredStudents.length;
+        const joinCount = attendIds.size;
+        const absentCount = totalInFilter - joinCount;
+        const percent = totalInFilter > 0 ? ((joinCount / totalInFilter) * 100).toFixed(1) : 0;
+
+        // อัปเดตตัวเลข Stats
+        document.getElementById('statTotalStudents').textContent = totalInFilter.toLocaleString();
         document.getElementById('statTotalJoin').textContent = joinCount.toLocaleString();
         document.getElementById('statPercent').textContent = percent + '%';
 
-        renderCharts(joinCount, absentCount, labels, barData);
+        renderCharts(joinCount, absentCount);
         renderTable(filteredStudents, attendIds);
     }
 
-    function renderCharts(join, absent, labels, barData) {
+    function renderCharts(join, absent) {
+        // Pie Chart: เขียว (#259b24) / เหลือง (#ffd54f) และไม่มี Stroke
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -224,47 +237,29 @@
                 labels: ['เข้าร่วมกิจกรรม', 'ขาดกิจกรรม'],
                 datasets: [{
                     data: [join, absent],
-                    backgroundColor: ['#259b24', '#ffd54f'], // สีเขียวเข้ม (#259b24) และเหลืองทอง (#ffd54f)
+                    backgroundColor: ['#259b24', '#ffd54f'], 
                     borderWidth: 0 
                 }]
             },
             options: { 
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: { 
                     legend: { 
                         position: 'bottom',
-                        labels: { font: { family: 'Kanit' } }
+                        labels: { font: { family: 'Kanit', size: 14 } }
                     } 
                 } 
-            }
-        });
-
-        if (barChart) barChart.destroy();
-        barChart = new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'จำนวนคน',
-                    data: barData,
-                    backgroundColor: '#ed8936',
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { 
-                    x: { beginAtZero: true, grid: { borderDash: [5,5] } },
-                    y: { ticks: { font: { family: 'Kanit' } } }
-                }
             }
         });
     }
 
     function renderTable(students, attendIds) {
-        const absentStudents = students.filter(s => !attendIds.has(s.id));
-        if ($.fn.DataTable.isDataTable('#absentTable')) $('#absentTable').DataTable().destroy();
+        const absentStudents = students.filter(s => !attendIds.has(String(s.id)));
+        
+        if ($.fn.DataTable.isDataTable('#absentTable')) {
+            $('#absentTable').DataTable().destroy();
+        }
 
         document.getElementById('absentBody').innerHTML = absentStudents.map(s => `
             <tr>
@@ -278,6 +273,7 @@
             language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
             pageLength: 10,
             dom: '<"flex justify-between mb-4"f>rt<"flex justify-between mt-4"ip>',
+            ordering: true
         });
     }
 </script>
